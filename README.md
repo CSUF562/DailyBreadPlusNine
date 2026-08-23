@@ -1,1 +1,27 @@
-IyBEYWlseUJyZWFkUGx1c05pbmUKCkRhaWx5QnJlYWRQbHVzTmluZSBnZW5lcmF0ZXMgYSBkYWlseSByZWZsZWN0aW9uIHRoYXQgZnVzZXMgTkFTQS1pbnNwaXJlZCBzY2llbmNlIG5vdGVzIHdpdGggbWluZGZ1bCBwcm9tcHRzIGFuZCBncmF0aXR1ZGUgc3BhcmtzLiBUaGUgInBsdXMgbmluZSIgY29tZXMgZnJvbSB0aGUgbmluZSBpbnZpdGF0aW9ucyBkZWxpdmVyZWQgZWFjaCBkYXnigJR0aHJlZSByZWZsZWN0aW9ucywgdGhyZWUgbWluZGZ1bCBhY3Rpb25zLCBhbmQgdGhyZWUgZ3JhdGl0dWRlIHNwYXJrcy4KCiMjIEdldHRpbmcgc3RhcnRlZAoKVGhpcyBwcm9qZWN0IHJlcXVpcmVzIFB5dGhvbiAzLjEwIG9yIG5ld2VyIGFuZCB1c2VzIHRoZSBQeXRob24gc3RhbmRhcmQgbGlicmFyeSBvbmx5LiBGcm9tIHRoZSByZXBvc2l0b3J5IHJvb3QsIHJ1biB0aGUgZ2VuZXJhdG9yIGRpcmVjdGx5IHdpdGggdGhlIG1vZHVsZSBlbnRyeXBvaW50OgoKYGBgYmFzaApweXRob24gLW0gZGFpbHlicmVhZApgYGAKClRvIHByb2R1Y2UgdGhlIGluc2lnaHQgZm9yIGEgc3BlY2lmaWMgZGF0ZSwgc3VwcGx5IHRoZSBgLS1kYXRlYCBmbGFnIChmb3JtYXQgYFlZWVktTU0tRERgKS4gVXNlIGAtLWZvcm1hdCBqc29uYCBpZiB5b3UgcHJlZmVyIHN0cnVjdHVyZWQgb3V0cHV0LgoKYGBgYmFzaApweXRob24gLW0gZGFpbHlicmVhZCAtLWRhdGUgMjAyNS0wMi0yNSAtLWZvcm1hdCBqc29uCmBgYAoKRGF0ZXMgbXVzdCBiZSB2YWxpZCBjYWxlbmRhciBkYXRlcyB3cml0dGVuIGV4YWN0bHkgYXMgYFlZWVktTU0tRERgLiBSZXN1bHRzIGFyZSBkZXRlcm1pbmlzdGljOiB0aGUgc2FtZSBkYXRlIGFsd2F5cyBwcm9kdWNlcyB0aGUgc2FtZSBpbnNpZ2h0IGFuZCBuaW5lIHByb21wdHMuIFRoZSBzY2llbmNlIGhpZ2hsaWdodHMgYXJlIGN1cmF0ZWQsIE5BU0EtaW5zcGlyZWQgZXhhbXBsZXMgc3RvcmVkIGluIHRoaXMgcmVwb3NpdG9yeTsgdGhleSBhcmUgbm90IGxpdmUgTkFTQSBkYXRhLgoKIyMgRGV2ZWxvcG1lbnQKClJ1biB0aGUgYXV0b21hdGVkIHRlc3RzIHdpdGhvdXQgaW5zdGFsbGluZyBhbnkgYWRkaXRpb25hbCBkZXBlbmRlbmNpZXM6CgpgYGBiYXNoCnB5dGhvbiAtbSB1bml0dGVzdCBkaXNjb3ZlciAtcyB0ZXN0cyAtdgpgYGAK
+# DailyBreadPlusNine
+
+DailyBreadPlusNine generates a daily reflection that fuses NASA-inspired science notes with mindful prompts and gratitude sparks. The "plus nine" comes from the nine invitations delivered each day—three reflections, three mindful actions, and three gratitude sparks.
+
+## Getting started
+
+This project requires Python 3.10 or newer and uses the Python standard library only. From the repository root, run the generator directly with the module entrypoint:
+
+```bash
+python -m dailybread
+```
+
+To produce the insight for a specific date, supply the `--date` flag (format `YYYY-MM-DD`). Use `--format json` if you prefer structured output.
+
+```bash
+python -m dailybread --date 2025-02-25 --format json
+```
+
+Dates must be valid calendar dates written exactly as `YYYY-MM-DD`. Results are deterministic: the same date always produces the same insight and nine prompts. The science highlights are curated, NASA-inspired examples stored in this repository; they are not live NASA data.
+
+## Development
+
+Run the automated tests without installing any additional dependencies:
+
+```bash
+python -m unittest discover -s tests -v
+```
