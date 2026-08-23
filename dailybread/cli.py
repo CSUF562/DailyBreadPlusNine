@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime
+from datetime import date
 from typing import Iterable
 
 from .generator import generate_entry
@@ -17,6 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--date",
         metavar="YYYY-MM-DD",
+        type=parse_date,
         help="Date to generate for (defaults to today).",
     )
     parser.add_argument(
@@ -28,13 +29,11 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def parse_date(value: str | None):
-    if not value:
-        return None
+def parse_date(value: str) -> date:
     try:
-        return datetime.strptime(value, "%Y-%m-%d").date()
+        return date.fromisoformat(value)
     except ValueError as exc:
-        raise SystemExit(f"Invalid date '{value}'. Use YYYY-MM-DD.") from exc
+        raise argparse.ArgumentTypeError(f"Invalid date '{value}'. Use YYYY-MM-DD.") from exc
 
 
 def render(entry, output_format: str) -> str:
@@ -46,7 +45,7 @@ def render(entry, output_format: str) -> str:
 def main(argv: Iterable[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
-    entry = generate_entry(parse_date(args.date))
+    entry = generate_entry(args.date)
     print(render(entry, args.format))
     return 0
 
