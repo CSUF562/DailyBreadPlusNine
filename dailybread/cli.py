@@ -12,7 +12,10 @@ from .generator import generate_entry
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate a Daily Bread insight inspired by NASA science and reflective practice.",
+        description=(
+            "Generate a Daily Bread + Nine reflection from an observed-sky layer, "
+            "a separately labeled astrological interpretation, and nine comparative sacred-text citations."
+        ),
     )
     parser.add_argument(
         "--date",
