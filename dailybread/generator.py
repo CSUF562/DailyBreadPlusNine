@@ -12,6 +12,7 @@ from typing import Dict, List
 
 from .astrology import interpret
 from .model import DailyComparativeEntry
+from .relevance import rank_citations
 from .sky import observations_for
 from .theme_engine import derive_theme
 from .traditions import find_by_theme
@@ -28,6 +29,7 @@ class DailyBreadEntry(DailyComparativeEntry):
     def to_text(self) -> str:
         lines: List[str] = []
         lines.append(f"Daily Bread + Nine for {self.target_date:%A, %B %d, %Y}")
+        lines.append(f"Ranking basis: {self.ranking_basis}")
         lines.append("")
         lines.append("Observed Sky")
         for observation in self.observations:
@@ -46,6 +48,11 @@ class DailyBreadEntry(DailyComparativeEntry):
         lines.append("The Plus Nine")
         for idx, citation in enumerate(self.citations, 1):
             lines.append(f"  {idx}. {citation.tradition} — {citation.work}, {citation.citation}")
+            if citation.relevance:
+                lines.append(
+                    f"     Relevance: astronomy {citation.relevance.astronomical}/100 | "
+                    f"astrology {citation.relevance.astrological}/100"
+                )
             lines.append(f"     {citation.context_note}")
         lines.append("")
         lines.append("Common Thread")
@@ -56,19 +63,28 @@ class DailyBreadEntry(DailyComparativeEntry):
         return "\n".join(lines)
 
 
-def generate_entry(target_date: date | None = None) -> DailyBreadEntry:
-    """Generate a source-separated Daily Bread + Nine entry."""
+def generate_entry(target_date: date | None = None, ranking_basis: str = "balanced") -> DailyBreadEntry:
+    """Generate a source-separated Daily Bread + Nine entry.
+
+    ranking_basis may be ``astronomy``, ``astrology``, or ``balanced``.
+    """
 
     target_date = target_date or date.today()
     observations = observations_for(target_date)
     astrological_factors = interpret(target_date, observations)
     theme = derive_theme(astrological_factors)
-    citations = find_by_theme(theme.theme, limit=9)
+    candidate_citations = find_by_theme(theme.theme, limit=9)
+    citations = rank_citations(
+        candidate_citations,
+        observations,
+        astrological_factors,
+        basis=ranking_basis,
+    )
 
     synthesis = (
         f"These traditions are not being presented as doctrinally equivalent. "
-        f"They are placed in conversation around the editorial theme of {theme.theme}, "
-        "which was derived from a separately labeled astrological interpretation of the day's sky context."
+        f"They are placed in conversation around the editorial theme of {theme.theme}. "
+        f"The displayed order is currently ranked by {ranking_basis} relevance."
     )
     reflection = f"Where might {theme.theme} require more conscious practice in my life today?"
 
@@ -78,6 +94,7 @@ def generate_entry(target_date: date | None = None) -> DailyBreadEntry:
         astrological_factors=astrological_factors,
         primary_theme=theme,
         citations=citations,
+        ranking_basis=ranking_basis,
         synthesis=synthesis,
         reflection=reflection,
     )
