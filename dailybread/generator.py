@@ -1,126 +1,100 @@
-"""Core logic for DailyBreadPlusNine."""
+"""Core DailyBreadPlusNine pipeline.
+
+Observed sky facts, astrological interpretation, theme selection, and sacred-text
+comparisons are kept as distinct stages so their evidence status is never blurred.
+"""
 
 from __future__ import annotations
 
-import functools
-import hashlib
-import json
-import random
-from dataclasses import dataclass
+from dataclasses import asdict
 from datetime import date
-from typing import Dict, List, Sequence
+from typing import Dict, List
 
-from importlib import resources
+from .astrology import interpret
+from .model import DailyComparativeEntry
+from .relevance import rank_citations
+from .sky import observations_for
+from .theme_engine import derive_theme
+from .traditions import find_by_theme
 
 
-@dataclass(frozen=True)
-class DailyBreadEntry:
-    """Represents a single day of Daily Bread content."""
-
-    target_date: date
-    cosmic_focus: Dict[str, str]
-    meaning_thread: Dict[str, str]
-    reflection_prompts: List[str]
-    mindful_actions: List[str]
-    gratitude_prompts: List[str]
-    affirmation: str
+class DailyBreadEntry(DailyComparativeEntry):
+    """Renderable daily comparative entry."""
 
     def to_dict(self) -> Dict[str, object]:
-        """Return a JSON-friendly representation of the entry."""
-
-        return {
-            "date": self.target_date.isoformat(),
-            "cosmic_focus": self.cosmic_focus,
-            "meaning_thread": self.meaning_thread,
-            "reflection_prompts": self.reflection_prompts,
-            "mindful_actions": self.mindful_actions,
-            "gratitude_prompts": self.gratitude_prompts,
-            "affirmation": self.affirmation,
-        }
+        payload = asdict(self)
+        payload["target_date"] = self.target_date.isoformat()
+        return payload
 
     def to_text(self) -> str:
-        """Render the entry as formatted text."""
-
         lines: List[str] = []
-        lines.append(f"Daily Bread for {self.target_date:%A, %B %d, %Y}")
+        lines.append(f"Daily Bread + Nine for {self.target_date:%A, %B %d, %Y}")
+        lines.append(f"Ranking basis: {self.ranking_basis}")
         lines.append("")
-        lines.append(f"Cosmic Focus — {self.cosmic_focus['title']}")
-        lines.append(f"  {self.cosmic_focus['summary']}")
-        lines.append(f"  Connection: {self.cosmic_focus['connection']}")
+        lines.append("Observed Sky")
+        for observation in self.observations:
+            lines.append(f"  • {observation.label}: {observation.value}")
+            lines.append(f"    Source: {observation.source.name} — {observation.source.reference}")
         lines.append("")
-        lines.append(f"Meaning Thread — {self.meaning_thread['theme']}")
-        lines.append(f"  {self.meaning_thread['invitation']}")
+        lines.append("Astrological Lens")
+        for factor in self.astrological_factors:
+            lines.append(f"  • {factor.label}: {factor.interpretation}")
+            lines.append(f"    Tradition: {factor.tradition}")
         lines.append("")
-        lines.append("Reflection Prompts:")
-        for idx, prompt in enumerate(self.reflection_prompts, 1):
-            lines.append(f"  {idx}. {prompt}")
+        if self.primary_theme:
+            lines.append(f"Human Theme — {self.primary_theme.theme.title()}")
+            lines.append(f"  {self.primary_theme.rationale}")
+            lines.append("")
+        lines.append("The Plus Nine")
+        for idx, citation in enumerate(self.citations, 1):
+            lines.append(f"  {idx}. {citation.tradition} — {citation.work}, {citation.citation}")
+            if citation.relevance:
+                lines.append(
+                    f"     Relevance: astronomy {citation.relevance.astronomical}/100 | "
+                    f"astrology {citation.relevance.astrological}/100"
+                )
+            lines.append(f"     {citation.context_note}")
         lines.append("")
-        lines.append("Mindful Actions:")
-        for idx, action in enumerate(self.mindful_actions, 1):
-            lines.append(f"  {idx}. {action}")
+        lines.append("Common Thread")
+        lines.append(f"  {self.synthesis}")
         lines.append("")
-        lines.append("Gratitude Sparks:")
-        for idx, spark in enumerate(self.gratitude_prompts, 1):
-            lines.append(f"  {idx}. {spark}")
-        lines.append("")
-        lines.append(f"Affirmation: {self.affirmation}")
+        lines.append("Daily Reflection")
+        lines.append(f"  {self.reflection}")
         return "\n".join(lines)
 
 
-def generate_entry(target_date: date | None = None) -> DailyBreadEntry:
-    """Generate a Daily Bread entry for a specific date."""
+def generate_entry(target_date: date | None = None, ranking_basis: str = "balanced") -> DailyBreadEntry:
+    """Generate a source-separated Daily Bread + Nine entry.
+
+    ranking_basis may be ``astronomy``, ``astrology``, or ``balanced``.
+    """
 
     target_date = target_date or date.today()
-    cosmic_focus = _select_single("nasa_insights", target_date, "cosmic")
-    meaning_thread = _select_single("meaning_threads", target_date, "meaning")
-    reflections = _select_multiple("reflection_prompts", 3, target_date, "reflect")
-    practices = _select_multiple("micro_practices", 3, target_date, "practice")
-    gratitudes = _select_multiple("gratitude_prompts", 3, target_date, "gratitude")
-    affirmation = _select_single("affirmations", target_date, "affirmation")
-    return DailyBreadEntry(
-        target_date=target_date,
-        cosmic_focus=cosmic_focus,
-        meaning_thread=meaning_thread,
-        reflection_prompts=reflections,
-        mindful_actions=practices,
-        gratitude_prompts=gratitudes,
-        affirmation=affirmation,
+    observations = observations_for(target_date)
+    astrological_factors = interpret(target_date, observations)
+    theme = derive_theme(astrological_factors)
+    candidate_citations = find_by_theme(theme.theme, limit=9)
+    citations = rank_citations(
+        candidate_citations,
+        observations,
+        astrological_factors,
+        basis=ranking_basis,
     )
 
+    synthesis = (
+        f"These traditions are not being presented as doctrinally equivalent. "
+        f"They are placed in conversation around the editorial theme of {theme.theme}. "
+        f"The displayed order is currently ranked by {ranking_basis} relevance."
+    )
+    reflection = f"Where might {theme.theme} require more conscious practice in my life today?"
 
-def _dataset_path(name: str) -> resources.abc.Traversable:
-    return resources.files(__package__).joinpath("data").joinpath(f"{name}.json")
-
-
-@functools.lru_cache(maxsize=None)
-def _load_dataset(name: str):
-    with _dataset_path(name).open("r", encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-def _select_single(dataset_name: str, target_date: date, label: str):
-    dataset = _load_dataset(dataset_name)
-    index = _deterministic_index(len(dataset), target_date, label)
-    return dataset[index]
-
-
-def _select_multiple(dataset_name: str, count: int, target_date: date, label: str) -> List[str]:
-    dataset: Sequence[str] = _load_dataset(dataset_name)
-    rng = random.Random(_seed_for(target_date, label))
-    if count >= len(dataset):
-        ordered = list(dataset)
-        ordered.sort()
-        return ordered
-    return rng.sample(list(dataset), count)
-
-
-def _deterministic_index(length: int, target_date: date, label: str) -> int:
-    if length == 0:
-        raise ValueError(f"Dataset '{label}' is empty")
-    seed = _seed_for(target_date, label)
-    return seed % length
-
-
-def _seed_for(target_date: date, label: str) -> int:
-    digest = hashlib.sha256(f"{target_date.isoformat()}::{label}".encode("utf-8")).hexdigest()
-    return int(digest, 16)
+    return DailyBreadEntry(
+        target_date=target_date,
+        observations=observations,
+        astrological_factors=astrological_factors,
+        primary_theme=theme,
+        citations=citations,
+        ranking_basis=ranking_basis,
+        synthesis=synthesis,
+        reflection=reflection,
+    )

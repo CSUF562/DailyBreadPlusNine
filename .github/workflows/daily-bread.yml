@@ -1,0 +1,37 @@
+name: Daily Bread + Nine
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Generate today's entry
+        run: |
+          mkdir -p output
+          TODAY="$(date -u +%F)"
+          python -m dailybread --date "$TODAY" > "output/$TODAY.txt"
+          python -m dailybread --date "$TODAY" --format json > "output/$TODAY.json"
+
+      - name: Upload daily entry artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-bread-${{ github.run_id }}
+          path: output/

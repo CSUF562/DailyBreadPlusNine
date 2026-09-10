@@ -1,26 +1,60 @@
 # DailyBreadPlusNine
 
-DailyBreadPlusNine generates a daily reflection that fuses NASA-inspired science notes with mindful prompts and gratitude sparks. The "plus nine" comes from the nine invitations delivered each day—three reflections, three mindful actions, and three gratitude sparks.
+DailyBreadPlusNine creates a daily comparative reflection using four deliberately separated layers:
+
+1. **Observed Sky** — verifiable astronomical facts, with NASA/JPL Horizons as the intended primary ephemeris source.
+2. **Astrological Lens** — historically rooted symbolic interpretation, clearly labeled as interpretive rather than scientific.
+3. **Human Theme** — an editorial bridge derived transparently from the astrological layer.
+4. **The Plus Nine** — nine citations from religious or philosophical traditions that resonate with the theme without claiming doctrinal equivalence.
+
+The core editorial rule is simple: astronomy supplies observations; astrology supplies symbolic interpretation; sacred texts are selected independently for thematic comparison.
 
 ## Getting started
 
-This project requires Python 3.10 or newer and uses the Python standard library only. From the repository root, run the generator directly with the module entrypoint:
+Python 3.10 or newer is required.
 
 ```bash
 python -m dailybread
 ```
 
-To produce the insight for a specific date, supply the `--date` flag (format `YYYY-MM-DD`). Use `--format json` if you prefer structured output.
+Generate a specific date:
 
 ```bash
-python -m dailybread --date 2025-02-25 --format json
+python -m dailybread --date 2026-09-10
 ```
 
-Dates must be valid calendar dates written exactly as `YYYY-MM-DD`. Results are deterministic: the same date always produces the same insight and nine prompts. The science highlights are curated, NASA-inspired examples stored in this repository; they are not live NASA data.
+Structured output:
+
+```bash
+python -m dailybread --date 2026-09-10 --format json
+```
+
+## Current architecture
+
+- `dailybread/sky.py` — observed-sky provenance and NASA/JPL adapter boundary
+- `dailybread/astrology.py` — symbolic interpretation layer
+- `dailybread/theme_engine.py` — transparent theme derivation
+- `dailybread/traditions.py` — curated comparative citation corpus
+- `dailybread/generator.py` — composition and rendering
+- `dailybread/model.py` — evidence-aware shared models
+
+## Evidence classes
+
+Every major content item is intended to remain identifiable as one of:
+
+- `observed` — astronomical or ephemeris fact
+- `interpretive` — astrological or symbolic reading
+- `comparative` — thematic sacred-text comparison
+
+This project does not treat astrology as scientific causation and does not claim that different religions teach identical doctrines.
+
+## Important implementation status
+
+The architecture has been rebuilt around the intended concept, but the live NASA/JPL Horizons request adapter is still pending. Until that adapter is implemented, `sky.py` returns a provenance-marked placeholder rather than inventing planetary positions. Sacred-text references in the starter corpus also require source-by-source editorial verification before public publication.
 
 ## Development
 
-Run the automated tests without installing any additional dependencies:
+Run the automated tests:
 
 ```bash
 python -m unittest discover -s tests -v

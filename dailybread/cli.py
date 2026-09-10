@@ -12,7 +12,10 @@ from .generator import generate_entry
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate a Daily Bread insight inspired by NASA science and reflective practice.",
+        description=(
+            "Generate a Daily Bread + Nine reflection from an observed-sky layer, "
+            "a separately labeled astrological interpretation, and nine comparative sacred-text citations."
+        ),
     )
     parser.add_argument(
         "--date",
@@ -25,6 +28,12 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("text", "json"),
         default="text",
         help="Output format (default: text).",
+    )
+    parser.add_argument(
+        "--relevance",
+        choices=("astronomy", "astrology", "balanced"),
+        default="balanced",
+        help="Rank the Plus Nine by astronomy, astrology, or balanced relevance.",
     )
     return parser
 
@@ -45,7 +54,7 @@ def render(entry, output_format: str) -> str:
 def main(argv: Iterable[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
-    entry = generate_entry(args.date)
+    entry = generate_entry(args.date, ranking_basis=args.relevance)
     print(render(entry, args.format))
     return 0
 
