@@ -21,7 +21,9 @@ class DailyBreadEntry(DailyComparativeEntry):
     """Renderable daily comparative entry."""
 
     def to_dict(self) -> Dict[str, object]:
-        return asdict(self)
+        payload = asdict(self)
+        payload["target_date"] = self.target_date.isoformat()
+        return payload
 
     def to_text(self) -> str:
         lines: List[str] = []
