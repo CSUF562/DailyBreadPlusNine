@@ -8,6 +8,7 @@ on:
   schedule:
     - cron: "0 10 * * *"
 
+# Manual validation trigger: second live run on 2026-09-10
 permissions:
   contents: read
 
