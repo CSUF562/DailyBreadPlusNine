@@ -9,6 +9,7 @@ on:
     - cron: "0 10 * * *"
 
 # Manual validation trigger: second live run on 2026-09-10
+# Manual validation trigger: latest live run on 2026-09-14
 permissions:
   contents: read
 
