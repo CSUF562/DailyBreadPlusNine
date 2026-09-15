@@ -67,6 +67,7 @@ class TraditionCitation:
     citation: str
     theme_tags: List[str]
     context_note: str
+    translation: Optional[str] = None
     excerpt: Optional[str] = None
     source: Optional[SourceRef] = None
     relevance: Optional[RelevanceScore] = None
