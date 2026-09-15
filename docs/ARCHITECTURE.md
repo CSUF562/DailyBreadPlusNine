@@ -66,6 +66,12 @@ Each citation record should include:
 - context note
 - source / edition metadata
 
+The user-facing reference note combines one short quotation with one concise
+tradition-specific context sentence. The title, passage locator, translation or
+edition, and source URL remain separately labeled so the comparative layer is
+auditable and is not mistaken for astronomical observation or astrological
+interpretation.
+
 The engine should prefer nine distinct traditions when the evidence base supports that. It should not force a weak match simply to reach nine.
 
 ## Proposed Python modules
