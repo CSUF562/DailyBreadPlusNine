@@ -40,6 +40,10 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(len(entry.citations), 9)
         self.assertTrue(all(citation.evidence_class == "comparative" for citation in entry.citations))
         self.assertTrue(all(citation.relevance is not None for citation in entry.citations))
+        self.assertTrue(all(citation.excerpt for citation in entry.citations))
+        self.assertTrue(all(citation.translation for citation in entry.citations))
+        self.assertTrue(all(citation.context_note for citation in entry.citations))
+        self.assertTrue(all(citation.source and citation.source.url for citation in entry.citations))
 
     def test_relevance_modes(self):
         for basis in ("astronomy", "astrology", "balanced"):
@@ -56,8 +60,15 @@ class GeneratorTests(unittest.TestCase):
         self.assertIn("Observed Sky", text)
         self.assertIn("Astrological Lens", text)
         self.assertIn("The Plus Nine", text)
+        self.assertEqual(text.count("Reference note:"), 9)
+        self.assertEqual(text.count("     Translation:"), 9)
         payload = json.loads(render(self.generate(), "json"))
         self.assertEqual(len(payload["citations"]), 9)
+        for citation in payload["citations"]:
+            self.assertTrue(citation["excerpt"])
+            self.assertTrue(citation["translation"])
+            self.assertTrue(citation["context_note"])
+            self.assertTrue(citation["source"]["url"])
 
 
 class CommandLineValidationTests(unittest.TestCase):
