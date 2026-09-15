@@ -48,12 +48,22 @@ class DailyBreadEntry(DailyComparativeEntry):
         lines.append("The Plus Nine")
         for idx, citation in enumerate(self.citations, 1):
             lines.append(f"  {idx}. {citation.tradition} — {citation.work}, {citation.citation}")
+            if citation.translation:
+                lines.append(f"     Translation: {citation.translation}")
             if citation.relevance:
                 lines.append(
                     f"     Relevance: astronomy {citation.relevance.astronomical}/100 | "
                     f"astrology {citation.relevance.astrological}/100"
                 )
-            lines.append(f"     {citation.context_note}")
+            if citation.excerpt:
+                lines.append(f"     Reference note: \u201c{citation.excerpt}\u201d {citation.context_note}")
+            else:
+                lines.append(f"     Context: {citation.context_note}")
+            if citation.source:
+                source_line = f"     Source: {citation.source.name} — {citation.source.reference}"
+                if citation.source.url:
+                    source_line += f" ({citation.source.url})"
+                lines.append(source_line)
         lines.append("")
         lines.append("Common Thread")
         lines.append(f"  {self.synthesis}")
