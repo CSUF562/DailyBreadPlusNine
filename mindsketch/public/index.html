@@ -23,7 +23,7 @@
         <button class="mode-card mode-card-featured" id="openFriend">
           <span class="mode-kicker">2 PLAYER</span>
           <span class="mode-title">Play a Friend</span>
-          <span class="mode-copy">One prompt. Two hidden drawings. Reveal them together.</span>
+          <span class="mode-copy">One broad category. Two hidden choices. See whether your minds land on the same idea.</span>
           <span class="mode-action">Create or join a room →</span>
         </button>
 
@@ -82,7 +82,9 @@
       <section class="panel">
         <div class="controls">
           <label>Watercolor spread <input id="soloSpread" type="range" min="0" max="100" value="55" /></label>
-          <label><input id="soloResponsive" type="checkbox" checked /> Responsive color</label>
+          <label><input id="soloResponsive" type="checkbox" checked /> Responsive watercolor</label>
+          <label>Line weight <input id="soloLineWeight" type="range" min="1" max="24" value="6" /></label>
+          <label>Line opacity <input id="soloLineOpacity" type="range" min="10" max="100" value="100" /></label>
         </div>
         <canvas id="soloCanvas" width="900" height="560" aria-label="Mood Canvas"></canvas>
         <div class="actions">
@@ -112,13 +114,15 @@
 
       <section id="drawingStage" class="panel hidden">
         <div class="promptbox">
-          <span class="label">SECRET PROMPT</span>
+          <span class="label">CATEGORY CARD</span>
           <strong id="prompt">...</strong>
           <span id="progress" class="msg"></span>
         </div>
         <div class="controls">
           <label>Watercolor spread <input id="spread" type="range" min="0" max="100" value="55" /></label>
-          <label><input id="responsive" type="checkbox" checked /> Responsive color</label>
+          <label><input id="responsive" type="checkbox" checked /> Responsive watercolor</label>
+          <label>Line weight <input id="lineWeight" type="range" min="1" max="24" value="6" /></label>
+          <label>Line opacity <input id="lineOpacity" type="range" min="10" max="100" value="100" /></label>
         </div>
         <canvas id="canvas" width="900" height="560" aria-label="Drawing canvas"></canvas>
         <div class="actions">
@@ -127,7 +131,7 @@
           <button id="clear" class="secondary">Clear</button>
           <button id="submit">Submit drawing</button>
         </div>
-        <p class="msg">Your opponent cannot see your drawing until the reveal.</p>
+        <p class="msg">Choose any subject that fits the category. Your opponent cannot see your choice until the reveal.</p>
       </section>
 
       <section id="revealStage" class="panel hidden">
