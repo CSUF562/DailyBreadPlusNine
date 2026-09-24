@@ -3,38 +3,113 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MindSketch Multiplayer</title>
+  <title>MindSketch</title>
+  <meta name="description" content="MindSketch is a playful drawing experience for solo watercolor expression and two-player hidden-prompt sketching." />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <main class="shell">
-    <header>
-      <p class="eyebrow">MINDSKETCH</p>
-      <h1>Draw what the other mind might see.</h1>
-      <p class="sub">Two players. One hidden prompt. Thirty seconds. Reveal both drawings together.</p>
-    </header>
-    <section id="lobby" class="panel">
-      <div class="fields">
-        <label>Your name <input id="name" maxlength="24" value="Player" /></label>
-        <label>Room code <input id="roomCode" maxlength="6" autocomplete="off" placeholder="AB12" /></label>
-      </div>
-      <div class="actions">
-        <button id="create">Create room</button>
-        <button id="join" class="secondary">Join room</button>
-      </div>
-      <p id="lobbyMsg" class="msg"></p>
+    <section id="home" class="home">
+      <header class="brand-hero">
+        <div class="brand-lockup" aria-label="MindSketch">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <p class="wordmark">MindSketch</p>
+        </div>
+        <h1>Draw what words can’t quite hold.</h1>
+        <p class="sub">Play with a friend, follow the mood of your own hand, or simply see where a line decides to go.</p>
+      </header>
+
+      <section class="mode-grid" aria-label="Choose a MindSketch mode">
+        <button class="mode-card mode-card-featured" id="openFriend">
+          <span class="mode-kicker">2 PLAYER</span>
+          <span class="mode-title">Play a Friend</span>
+          <span class="mode-copy">One prompt. Two hidden drawings. Reveal them together.</span>
+          <span class="mode-action">Create or join a room →</span>
+        </button>
+
+        <button class="mode-card" id="openMood">
+          <span class="mode-kicker">SOLO</span>
+          <span class="mode-title">Mood Canvas</span>
+          <span class="mode-copy">Let movement, rhythm, and pauses shape responsive watercolor.</span>
+          <span class="mode-action">Start drawing →</span>
+        </button>
+
+        <button class="mode-card mode-card-muted" disabled>
+          <span class="mode-kicker">COMING NEXT</span>
+          <span class="mode-title">Play with AI</span>
+          <span class="mode-copy">Sketch against an AI interpretation without seeing its answer first.</span>
+          <span class="mode-action">In development</span>
+        </button>
+      </section>
+
+      <section class="home-note">
+        <span class="mini-mark" aria-hidden="true"></span>
+        <p><strong>MindSketch is about interpretation, not artistic skill.</strong> Bad drawings are not a bug. They are frequently the most entertaining part.</p>
+      </section>
     </section>
+
+    <section id="friendLobby" class="hidden">
+      <div class="section-head">
+        <button class="back-link" id="friendBack" type="button">← MindSketch</button>
+        <div>
+          <p class="eyebrow">PLAY A FRIEND</p>
+          <h2>Meet in the same room. Draw separately.</h2>
+          <p class="sub">Create a room and share the code, or enter a code from your friend.</p>
+        </div>
+      </div>
+      <section id="lobby" class="panel lobby-panel">
+        <div class="fields">
+          <label>Your name <input id="name" maxlength="24" value="Player" /></label>
+          <label>Room code <input id="roomCode" maxlength="6" autocomplete="off" placeholder="AB12" /></label>
+        </div>
+        <div class="actions">
+          <button id="create">Create room</button>
+          <button id="join" class="secondary">Join room</button>
+        </div>
+        <p id="lobbyMsg" class="msg"></p>
+      </section>
+    </section>
+
+    <section id="solo" class="hidden">
+      <div class="section-head">
+        <button class="back-link" id="soloBack" type="button">← MindSketch</button>
+        <div>
+          <p class="eyebrow">MOOD CANVAS</p>
+          <h2>Follow the movement, not the outcome.</h2>
+          <p class="sub">Your recent mouse or touch movement gently shifts the watercolor family. Slower strokes cool it; quicker gestures warm it.</p>
+        </div>
+      </div>
+      <section class="panel">
+        <div class="controls">
+          <label>Watercolor spread <input id="soloSpread" type="range" min="0" max="100" value="55" /></label>
+          <label><input id="soloResponsive" type="checkbox" checked /> Responsive color</label>
+        </div>
+        <canvas id="soloCanvas" width="900" height="560" aria-label="Mood Canvas"></canvas>
+        <div class="actions">
+          <button id="soloUndo" class="secondary">Undo</button>
+          <button id="soloRedo" class="secondary">Redo</button>
+          <button id="soloClear" class="secondary">Clear</button>
+          <button id="soloFinish">Finish</button>
+        </div>
+        <div id="soloResult" class="result-note hidden"></div>
+      </section>
+    </section>
+
     <section id="game" class="hidden">
+      <button class="back-link" id="gameBack" type="button">← Leave room</button>
       <div class="statusbar panel">
         <div><span class="label">ROOM</span><strong id="codeLabel">----</strong></div>
         <div><span class="label">ROUND</span><strong id="roundLabel">0</strong></div>
         <div><span class="label">TIME</span><strong id="timer">--</strong></div>
         <div><span class="label">PLAYERS</span><strong id="playersLabel">1/2</strong></div>
       </div>
-      <section id="waiting" class="panel">
+
+      <section id="waiting" class="panel waiting-card">
+        <p class="eyebrow">ROOM READY</p>
         <h2>Waiting for Player 2</h2>
         <p>Share the room code above. Each player should join from a separate browser or device.</p>
       </section>
+
       <section id="drawingStage" class="panel hidden">
         <div class="promptbox">
           <span class="label">SECRET PROMPT</span>
@@ -54,6 +129,7 @@
         </div>
         <p class="msg">Your opponent cannot see your drawing until the reveal.</p>
       </section>
+
       <section id="revealStage" class="panel hidden">
         <p class="label">REVEAL</p>
         <h2 id="revealPrompt"></h2>
