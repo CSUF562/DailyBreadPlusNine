@@ -82,6 +82,7 @@
       <section class="panel">
         <div class="controls">
           <label>Watercolor spread <input id="soloSpread" type="range" min="0" max="100" value="55" /></label>
+          <label>Response scale <input id="soloResponseScale" type="range" min="0" max="100" value="55" /></label>
           <label><input id="soloResponsive" type="checkbox" checked /> Responsive watercolor</label>
           <label>Line weight <input id="soloLineWeight" type="range" min="1" max="24" value="6" /></label>
           <label>Line opacity <input id="soloLineOpacity" type="range" min="10" max="100" value="100" /></label>
@@ -120,6 +121,7 @@
         </div>
         <div class="controls">
           <label>Watercolor spread <input id="spread" type="range" min="0" max="100" value="55" /></label>
+          <label>Response scale <input id="responseScale" type="range" min="0" max="100" value="55" /></label>
           <label><input id="responsive" type="checkbox" checked /> Responsive watercolor</label>
           <label>Line weight <input id="lineWeight" type="range" min="1" max="24" value="6" /></label>
           <label>Line opacity <input id="lineOpacity" type="range" min="10" max="100" value="100" /></label>
@@ -141,6 +143,30 @@
         <button id="nextRound">Next round</button>
       </section>
     </section>
+
+    <aside class="music-dock panel" aria-label="MindSketch music">
+      <div class="music-main">
+        <div>
+          <p class="eyebrow">MINDSKETCH SOUNDTRACK</p>
+          <strong id="musicTrack">Drift</strong>
+          <span id="musicStatus" class="msg">Ready</span>
+        </div>
+        <div class="music-actions">
+          <button id="musicPlay" type="button">Play</button>
+          <button id="musicMute" type="button" class="secondary">Mute</button>
+        </div>
+      </div>
+      <label class="music-volume">Volume
+        <input id="musicVolume" type="range" min="0" max="100" value="32" />
+      </label>
+      <div class="spotify-row">
+        <div>
+          <strong>Spotify</strong>
+          <span id="spotifyStatus" class="msg">Checking connection…</span>
+        </div>
+        <button id="spotifyConnect" type="button" class="secondary" disabled>Connect Spotify</button>
+      </div>
+    </aside>
   </main>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js"></script>
