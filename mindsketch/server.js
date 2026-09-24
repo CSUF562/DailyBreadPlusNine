@@ -13,10 +13,30 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 
 const rooms = new Map();
 const prompts = [
-  'A cat wearing a crown', 'A house on the moon', 'A dancing cactus',
-  'A fish riding a bicycle', 'A sleepy dragon', 'A piano in the rain',
-  'A robot making breakfast', 'A lighthouse in a storm', 'A flying teacup',
-  'A tree with a secret door', 'A penguin at the beach', 'A surprised banana'
+  'Fruit',
+  'Animal',
+  'Vehicle',
+  'Something in the sky',
+  'Something you wear',
+  'Something found in a kitchen',
+  'Musical instrument',
+  'Dessert',
+  'Flower or plant',
+  'Sea creature',
+  'Sport',
+  'Weather',
+  'A place you might visit',
+  'Something found at school',
+  'Something found in a bathroom',
+  'Something that flies',
+  'A household object',
+  'A job or profession',
+  'Something cold',
+  'Something round',
+  'Something you would take on vacation',
+  'Something found in a park',
+  'Something that makes noise',
+  'Something you might give as a gift'
 ];
 
 function makeCode() {
