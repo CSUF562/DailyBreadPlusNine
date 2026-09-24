@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/config', (_req, res) => res.json({
+  spotifyEnabled: Boolean(process.env.SPOTIFY_CLIENT_ID),
+  spotifyClientId: process.env.SPOTIFY_CLIENT_ID || null
+}));
 
 const rooms = new Map();
 const prompts = [
