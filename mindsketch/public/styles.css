@@ -65,3 +65,11 @@ canvas{display:block;width:100%;height:auto;background:#fbfaf4;border:1px solid 
 .result-note{margin-top:16px;padding:14px 16px;border-radius:13px;background:#edf3f1;color:#355c57;line-height:1.45}
 @media(max-width:760px){.mode-grid{grid-template-columns:1fr}.mode-card{min-height:190px}.fields,.reveal-grid{grid-template-columns:1fr}.statusbar{grid-template-columns:repeat(2,1fr)}.shell{margin-top:16px}.brand-hero{padding-top:20px}}
 @media(prefers-reduced-motion:reduce){.mode-card{transition:none}}
+.music-dock{margin-top:22px;display:grid;gap:14px}
+.music-main,.spotify-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.music-main>div:first-child,.spotify-row>div:first-child{display:grid;gap:3px}
+.music-actions{display:flex;gap:8px;flex-wrap:wrap}
+.music-volume{display:grid;grid-template-columns:auto minmax(180px,1fr);align-items:center;gap:12px}
+.spotify-row{padding-top:12px;border-top:1px solid var(--line)}
+.spotify-row strong{display:block}
+@media(max-width:620px){.music-volume{grid-template-columns:1fr}.music-actions{width:100%}.music-actions button{flex:1}}
