@@ -133,7 +133,7 @@ function startCountdown(){
   countdown=setInterval(tick,250);
 }
 
-function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}){
+function createPainter({canvas, spreadEl, responsiveEl, lineWeightEl, lineOpacityEl, undoEl, redoEl, clearEl}){
   const ctx=canvas.getContext('2d');
   let drawing=false,current=[],strokes=[],redo=[],last=null,strokeStart=0;
   let metrics=freshMetrics(),mood=freshMood();
@@ -156,6 +156,18 @@ function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}
     return .55+(Number(spreadEl.value)/100)*1.3;
   }
 
+  function solidWeight(){
+    return Number(lineWeightEl?.value || 6);
+  }
+
+  function solidOpacity(){
+    return Number(lineOpacityEl?.value || 100) / 100;
+  }
+
+  function isResponsive(){
+    return responsiveEl.checked;
+  }
+
   function updateMood(){
     mood.energy=clamp(metrics.recentSpeed/1.55);
     mood.flow=clamp(metrics.recentFlow/250);
@@ -165,7 +177,6 @@ function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}
   }
 
   function palette(m){
-    if(!responsiveEl.checked)return[205,220,190];
     if(m.tension>.74)return[338,355,315];
     if(m.energy>.82)return[30,44,15];
     if(m.playfulness>.64)return[270,292,220];
@@ -224,11 +235,28 @@ function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}
     }
   }
 
+  function drawSolidSegment(a,b,style={}){
+    ctx.save();
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+    ctx.lineWidth=style.lineWidth ?? solidWeight();
+    ctx.strokeStyle=`rgba(38,36,31,${style.opacity ?? solidOpacity()})`;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.lineTo(b.x,b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function redraw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for(const st of strokes){
       for(let i=1;i<st.points.length;i++){
-        segment(st.points[i-1],st.points[i],st,i+st.seed*17);
+        if(st.mode==='solid'){
+          drawSolidSegment(st.points[i-1],st.points[i],st);
+        }else{
+          segment(st.points[i-1],st.points[i],st,i+st.seed*17);
+        }
       }
     }
   }
@@ -297,13 +325,19 @@ function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}
       mood:{...mood},
       start:strokeStart,
       spread:spread(),
-      seed:strokes.length+1
+      seed:strokes.length+1,
+      mode:isResponsive()?'watercolor':'solid',
+      lineWidth:solidWeight(),
+      opacity:solidOpacity()
     };
 
-    segment(last,p,snap,current.length+snap.seed*19);
-
-    if(turn&&current.length%5===0){
-      dab(p.x+8,p.y-6,6,snap.mood,.05,snap.seed+current.length,snap.spread);
+    if(snap.mode==='solid'){
+      drawSolidSegment(last,p,snap);
+    }else{
+      segment(last,p,snap,current.length+snap.seed*19);
+      if(turn&&current.length%5===0){
+        dab(p.x+8,p.y-6,6,snap.mood,.05,snap.seed+current.length,snap.spread);
+      }
     }
 
     current.push(p);
@@ -319,7 +353,10 @@ function createPainter({canvas, spreadEl, responsiveEl, undoEl, redoEl, clearEl}
         mood:{...mood},
         start:strokeStart,
         spread:spread(),
-        seed:strokes.length+1
+        seed:strokes.length+1,
+        mode:isResponsive()?'watercolor':'solid',
+        lineWidth:solidWeight(),
+        opacity:solidOpacity()
       });
       redo=[];
     }
@@ -345,6 +382,8 @@ const multiPainter=createPainter({
   canvas:$('canvas'),
   spreadEl:$('spread'),
   responsiveEl:$('responsive'),
+  lineWeightEl:$('lineWeight'),
+  lineOpacityEl:$('lineOpacity'),
   undoEl:$('undo'),
   redoEl:$('redo'),
   clearEl:$('clear')
@@ -354,6 +393,8 @@ const soloPainter=createPainter({
   canvas:$('soloCanvas'),
   spreadEl:$('soloSpread'),
   responsiveEl:$('soloResponsive'),
+  lineWeightEl:$('soloLineWeight'),
+  lineOpacityEl:$('soloLineOpacity'),
   undoEl:$('soloUndo'),
   redoEl:$('soloRedo'),
   clearEl:$('soloClear')
@@ -377,3 +418,12 @@ $('soloFinish').addEventListener('click',()=>{
   result.textContent=text+' This is an expressive reading of the drawing behavior, not an assessment of your emotional state.';
   result.classList.remove('hidden');
 });
+function syncPainterControls(responsiveId, spreadId){
+  const responsiveEl=$(responsiveId);
+  const spreadEl=$(spreadId);
+  const sync=()=>{ spreadEl.disabled=!responsiveEl.checked; };
+  responsiveEl.addEventListener('change',sync);
+  sync();
+}
+syncPainterControls('responsive','spread');
+syncPainterControls('soloResponsive','soloSpread');
